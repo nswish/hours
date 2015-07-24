@@ -33,13 +33,18 @@
       card['content'] = table.rows[1].cells[0].innerHTML;
       card['leave'] = table.rows[2].cells[0].firstChild.innerText;
 
-      if(card['content'] === '无刷卡记录') {
-        card['hours'] = (card['leave'] === '无' ? 0 : 8);
-      } else {
-        tokens = card['content'].split('~');
+      tokens = card['content'].split('~');
+      if(tokens.length > 1) {
         card['hours'] = (new Date(2000,1,1,tokens[1].split(':')[0],tokens[1].split(':')[1]) - new Date(2000,1,1,tokens[0].split(':')[0],tokens[0].split(':')[1])) / 1000 / 3600 - 1
+      } else {
+        card['hours'] = NaN;
       }
 
+      // 将忘记打卡等，任何其他未知情况造成NaN错误的，统一置为0
+      if(isNaN(card.hours)) {
+        card['hours'] = (card['leave'] === '无' ? 0 : 8);
+      }
+    
       cards.push(card);
     }
   }
